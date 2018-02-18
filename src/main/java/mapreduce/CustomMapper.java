@@ -27,9 +27,9 @@ public class CustomMapper extends Mapper<LongWritable, Text, Text, TextArrayWrit
   @Override
   protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
     System.err.println(value.toString());
-    StringTokenizer lineTokenizer = new StringTokenizer(value.toString(), "\r"); // splitting string into tokens by lines
-    // run until 14 ; 14 lines per record
-    while (context.getCounter(Counters.NUM_LINES).getValue() < 14) {
+    StringTokenizer lineTokenizer = new StringTokenizer(value.toString(), "\n"); // splitting string into tokens by lines
+      // run until 14 ; 14 lines per record
+    while (context.getCounter(Counters.NUM_LINES).getValue() < 14 && lineTokenizer.hasMoreTokens()) {
       String line = lineTokenizer.nextToken();
       if (line.startsWith("REVISION")) {
         _key.set(line.split(" ")[3]);

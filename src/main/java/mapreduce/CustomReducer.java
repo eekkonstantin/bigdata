@@ -22,7 +22,10 @@ public class CustomReducer extends Reducer<Text, TextArrayWritable, Text, IntWri
   // Make sure that the output key/value classes also match those set in your job's configuration (see below).
   @Override
   protected void reduce(Text key, Iterable<TextArrayWritable> values, Context context) throws IOException, InterruptedException {
-
+    int sum = 0;
+    for (TextArrayWritable tarray : values)
+      sum += tarray.get().length;
+    context.write(key, new IntWritable(sum));
   }
 
   @Override

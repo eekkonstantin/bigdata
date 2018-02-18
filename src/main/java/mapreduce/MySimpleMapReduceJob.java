@@ -36,7 +36,7 @@ public class MySimpleMapReduceJob extends Configured implements Tool {
 		job.setReducerClass(CustomReducer.class);
 
 		// 3. Set input and output format, mapper output key and value classes, and final output key and value classes
-		job.setInputFormatClass(TextInputFormat.class);
+		job.setInputFormatClass(CustomInputFormat.class);
 		job.setMapOutputKeyClass(Text.class);
 		job.setMapOutputValueClass(TextArrayWritable.class);
 		job.setOutputKeyClass(Text.class);
