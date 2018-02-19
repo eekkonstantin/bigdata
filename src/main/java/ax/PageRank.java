@@ -16,6 +16,7 @@ import org.apache.hadoop.io.Text;
 
 public class PageRank extends Configured implements Tool {
   public static final float DF = 0.85f;
+  public static final String LINK_PREFIX = "links";
   public int ITERS = 2;
 
   public int run(String[] args) throws Exception {
@@ -29,11 +30,11 @@ public class PageRank extends Configured implements Tool {
     // set iteration vars
     String in, out;
     // run iterations
-    for (int i=0; i < ITERS; i++) {
-      in = args[1] + "/iter" + i;
-      out = args[1] + "/iter" + (i+1);
-      System.err.println("Iter " + (i+1) + " of " + ITERS + ": Calculation...");
-      if (!jobIter(in, out))
+    for (int i=1; i <= ITERS; i++) {
+      in = args[1] + "/iter" + (i-1);
+      out = args[1] + "/iter" + i;
+      System.err.println("Iter " + i + " of " + ITERS + ": Calculation...");
+      if (!jobIter(in, out, i))
         return 1;
     }
 
@@ -72,7 +73,7 @@ public class PageRank extends Configured implements Tool {
 		return job.waitForCompletion(true);
   }
 
-  public boolean jobIter(String in, String out) throws Exception {
+  public boolean jobIter(String in, String out, int iter) throws Exception {
     // 0. Instantiate a Job object; remember to pass the Driver's configuration on to the job
     Job job = Job.getInstance(getConf(), "Calculation");
 
@@ -94,6 +95,12 @@ public class PageRank extends Configured implements Tool {
 		// 4. Set input and output paths; remember, these will be HDFS paths or URLs
 		FileInputFormat.setInputPaths(job, new Path(in));
 		FileOutputFormat.setOutputPath(job, new Path(out));
+
+    // 5. Set other misc configuration parameters (#reducer tasks, counters, env variables, etc.)
+		job.getConfiguration().setInt("IterID", iter);
+		job.getConfiguration().setInt("MAX_ITERS", ITERS);
+		job.getConfiguration().set("LINK_PREFIX", LINK_PREFIX);
+		job.getConfiguration().setFloat("DF", DF);
 
     // 6. Finally, submit the job to the cluster and wait for it to complete; set param to false if you don't want to see progress reports
 		return job.waitForCompletion(true);

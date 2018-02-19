@@ -18,13 +18,25 @@ public class IterMapper extends Mapper<LongWritable, Text, Text, Text> {
   @Override
   protected void setup(Context context) throws IOException, InterruptedException {
     super.setup(context);
-    LINK_PREFIX = "links";
+    LINK_PREFIX = context.getConfiguration().get("LINK_PREFIX");
   }
 
   // The main map() function; the input key/value classes must match the first two above, and the key/value classes in your emit() statement must match the latter two above.
+  /**
+   * Input:
+   *  K: linenumber
+   *  V: title \t PR \t link1,link2,....
+   *
+   * Output 1:
+   *  K: title
+   *  V: LINK_PREFIX \t link1,link2,....
+   * Output 2:
+   *  K: linkX
+   *  V: PR \t count(outlinks from title)
+   */
   @Override
   protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-    String[] tokens = value.toString().split("\t");
+    String[] tokens = value.toString().split("\t| "); // TITLE, PR, (nullable)LINKS
 
     String title = tokens[0];
     String pr = tokens[1];
@@ -35,7 +47,7 @@ public class IterMapper extends Mapper<LongWritable, Text, Text, Text> {
       links = new String[0];
 
     _src.set(title);
-    _val.set(LINK_PREFIX + "\t" + (tokens.length > 2 ? tokens[2] : " "));
+    _val.set((LINK_PREFIX + "\t" + (tokens.length > 2 ? tokens[2] : " ")).trim());
     context.write(_src, _val);
 
     for (String link : links) {
