@@ -41,6 +41,8 @@ public class IterReducer extends Reducer<Text, Text, Text, Text> {
    *  K: title
    *  V: PR \t link1,link2,....
    * Output: (LAST ITER)
+   *  K: title
+   *  V: PR
    */
   @Override
   protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
@@ -49,6 +51,7 @@ public class IterReducer extends Reducer<Text, Text, Text, Text> {
 
     for (Text v : values) {
       String[] inValData = v.toString().split("\t| "); // LINK_PREFIX, (nullable)LINKS
+                                                       // PR, count
       if (inValData[0].startsWith(LINK_PREFIX)) // links \t [links]
         pageLinks += (inValData.length > 1 ? inValData[1] : "");
       else { // pr \t linkCount - use to calculate score

@@ -21,6 +21,18 @@ public class InitMapper extends Mapper<LongWritable, Text, Text, Text> {
   }
 
   // The main map() function; the input key/value classes must match the first two above, and the key/value classes in your emit() statement must match the latter two above.
+  /**
+   * Input:
+   *  K: linenumber
+   *  V: <Revision Record - 14lines, incl. 1 empty line at the end>
+   *
+   * Output:
+   *  K: title
+   *  V: outlink
+   * Output: (if no data in MAIN)
+   *  K: title
+   *  V: <empty>
+   */
   @Override
   protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
     StringTokenizer lineTokenizer = new StringTokenizer(value.toString(), "\n"); // splitting string into tokens by lines
@@ -39,7 +51,7 @@ public class InitMapper extends Mapper<LongWritable, Text, Text, Text> {
         _val.set(o);
         context.write(_src, _val);
       }
-    } else
+    } else // in case [title] has no outlinks
       context.write(_src, new Text());
   }
 
