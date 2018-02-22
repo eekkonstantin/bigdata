@@ -41,25 +41,25 @@ In `REVISION`, the third item `article_title` is used to uniquely identify relev
 `MAIN` provides the `article_title`s of other pages linked to (i.e., ***outlinks***) by the current article. All references are mapped and passed on to [InitReducer](/src/main/java/ax/InitReducer.java), which then **filters out repeated data**, and assigns each article an initial PageRank score (more on this [below](#2-ranking-rounds)).
 ### Input / Output
 [InitMapper.java](/src/main/java/ax/InitMapper.java)
->Input:
-> K: [Line Number]
-> V: [Revision Record - 14lines, including 1 empty line at the end]
->
->Output:
-> K: `article_title`
-> V: `outlink_title`
->Output: (if no data in MAIN)
-> K: `article_title`
-> V: empty
+>Input:   
+> K: [Line Number]   
+> V: [Revision Record - 14lines, including 1 empty line at the end]   
+>   
+>Output:   
+> K: `article_title`   
+> V: `outlink_title`   
+>Output: (if no data in MAIN)   
+> K: `article_title`   
+> V: empty   
 
 [InitReducer.java](/src/main/java/ax/InitReducer.java)
->Input:
-> K: `article_title`
-> V: `outlink_title` (or empty)
->
->Output:
-> K: `article_title`
-> V: `PR`\t`outlink1,outlink2,....`
+>Input:   
+> K: `article_title`   
+> V: `outlink_title` (or empty)   
+>   
+>Output:   
+> K: `article_title`   
+> V: `PR    outlink1,outlink2,....`   
 
 ## 2) Ranking Rounds
 ### PageRank Formula
@@ -71,40 +71,40 @@ This formula is applied in rounds, with all pages initially assigned a PageRank 
 The values of `INIT_RANK` and `DF` are set in the main [PageRank](/src/main/java/ax/PageRank.java) class and sent to the `Init` and `Iter` reducers respectively to be used in the calculation of each page's the PageRank score.
 ### Iterations
 To run this step in repeated rounds, the [IterMapper](/src/main/java/ax/IterMapper.java) produces two kind of output:
-> A - preserves the list of outlinks from each page
-> B - sends the relevant numbers needed for calculating PageRank
+> A - preserves the list of outlinks from each page   
+> B - sends the relevant numbers needed for calculating PageRank   
 
 The [IterReducer](/src/main/java/ax/IterMapper.java) then uses `Output B` to calculate the PageRank score of an article, and outputs that score in the same format as the input of the Mapper.
 After each step, the main PageRank class reassigns the input and output paths and starts a new Job running the same task.
 ### Input / Output
 [IterMapper.java](/src/main/java/ax/IterMapper.java)
->Input:
-> K: [Line Number]
-> V: `article_title`\t`PR`\t`outlink1,outlink2,....`
->
->Output A:
-> K: `article_title`
-> V: `LINK_PREFIX`\t`outlink1,outlink2,....`
->Output B:
-> K: `linkX`
-> V: `PR`\tcount(outlinks from title)
+>Input:   
+>> K: [Line Number]   
+> V: `article_title    PR    outlink1,outlink2,....`   
+>   
+>Output A:   
+> K: `article_title`   
+> V: `LINK_PREFIX    outlink1,outlink2,....`   
+>Output B:   
+> K: `linkX`   
+> V: `PR    count(outlinks from title)`   
 
 Notes: `LINK_PREFIX` is an arbitrary string to help IterReducer differentiate the 2 output types. `linkX` refers to an outlink from `article_title`. Every outlink will have its own Key-Value pair.  
 
 [IterReducer.java](/src/main/java/ax/IterReducer.java)
->Input A:
-> K: `article_title`
-> V: `LINK_PREFIX`\t`outlink1,outlink2,....`
->Input B:
-> K: `linkX`
-> V: `PR`\tcount(outlinks from title)
->
->Output:
-> K: `article_title`
-> V: `PR`\t`outlink1,outlink2,....`
->Output: (LAST ITERATION)
-> K: `article_title`
-> V: `PR`
+>Input A:   
+> K: `article_title`   
+> V: `LINK_PREFIX    outlink1,outlink2,....`   
+>Input B:   
+> K: `linkX`   
+> V: `PR`    count(outlinks from title)   
+>   
+>Output:   
+> K: `article_title`   
+> V: `PR    outlink1,outlink2,....`   
+>Output: (LAST ITERATION)   
+> K: `article_title`   
+> V: `PR`   
 
 # Modifications to Provided Files
 None. Only the package name in the `hadoop` command is changed, from `mapreduce` to `ax`. The files in the `mapreduce` directory are removed.
