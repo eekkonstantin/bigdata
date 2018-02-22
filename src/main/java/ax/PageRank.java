@@ -64,8 +64,8 @@ public class PageRank extends Configured implements Tool {
    *    title \t PR \t link1,link2,....
    * Where [title] is the `article_id` in the REVISION metadata, and [PR]
    * is the initial Page Rank as specified in `INIT_RANK`. The rest of the
-   * data is a comma-separated list of outlinks from [title], as seen in
-   * MAIN in the Revision Record.
+   * data is a comma-separated list of outlinks from [title], retrieved
+   * from the MAIN line in the Revision Record.
    */
   public boolean jobInit(String in, String out) throws Exception {
     // 0. Instantiate a Job object; remember to pass the Driver's configuration on to the job
