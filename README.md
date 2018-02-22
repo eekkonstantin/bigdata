@@ -1,5 +1,9 @@
 # Project Goal
 Implement a watered-down version of the PageRank algorithm, using parsed data from a sample of Wikipedia's edit history.
+## Authors
+Elizabeth Konstantin Kwek Jin Li \\ 2287563K
+Ng Kai Feng Bernard \\ 2287600N
+University of Glasgow Computing Science Level 4
 
 # Usage
 Choose where to access data files and execute jobs using the following:
